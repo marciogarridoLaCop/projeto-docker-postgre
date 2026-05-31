@@ -1,0 +1,25 @@
+# Blueprint do Render: serviço web (Docker) usando o PostgreSQL que VOCÊ já criou.
+# Deploy: painel do Render -> New -> Blueprint -> aponte para este repositório.
+# Depois, no serviço web, defina DATABASE_URL com a INTERNAL URL do seu banco.
+
+services:
+  - type: web
+    name: sensores-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: sh /scripts/render-start.sh
+    healthCheckPath: /accounts/login/
+    autoDeploy: true
+    envVars:
+      - key: DEBUG
+        value: "0"
+      - key: SECRET_KEY
+        generateValue: true          # Render gera uma chave segura
+      - key: DATABASE_URL
+        sync: false                  # cole a INTERNAL URL do seu banco Render
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false                  # definir no painel
+      - key: GOOGLE_OAUTH_SECRET
+        sync: false                  # definir no painel (rotacionar o exposto)

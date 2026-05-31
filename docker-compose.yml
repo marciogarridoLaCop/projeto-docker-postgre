@@ -1,0 +1,15 @@
+# Sem PostgreSQL local: o banco é o PostgreSQL gerenciado do Render,
+# acessado via DATABASE_URL (definida no dotenv_files/.env para uso local).
+services:
+  djangoapp:
+    container_name: djangoapp
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./djangoapp:/djangoapp
+      - ./data/web/static:/data/web/static/
+      - ./data/web/media:/data/web/media/
+    env_file:
+      - ./dotenv_files/.env

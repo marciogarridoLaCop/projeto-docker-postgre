@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro indisponível</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: #07080c; color: #e7e9f0; font-family: 'Sora', system-ui, sans-serif; text-align: center;
+    }
+    .box { max-width: 380px; padding: 36px; background: #12151d; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; }
+    h1 { font-size: 18px; margin: 0 0 10px; }
+    p { color: #8b909e; font-size: 14px; line-height: 1.6; margin: 0 0 22px; }
+    a { display: inline-block; text-decoration: none; background: #5b8def; color: #fff; padding: 10px 18px; border-radius: 9px; font-weight: 600; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🔒 Acesso restrito</h1>
+    <p>Esta conta Google ainda não está cadastrada. Apenas o administrador pode criar novos usuários. Fale com o responsável para liberar seu acesso.</p>
+    <a href="{% url 'account_login' %}">Voltar ao login</a>
+  </div>
+</body>
+</html>

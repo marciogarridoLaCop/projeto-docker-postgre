@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="{% if perfil.tema == 'light' %}light{% else %}dark{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telemetria · Monitoramento de Sensores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #07080c; --bg-2: #0a0c12;
+      --panel: rgba(20, 23, 32, 0.72); --panel-solid: #12151d;
+      --border: rgba(255,255,255,0.07); --border-strong: rgba(255,255,255,0.12);
+      --text: #e7e9f0; --muted: #8b909e; --faint: #565b69;
+      --temp: #f0883e; --press: #5b8def; --umid: #2dd4bf; --alt: #a78bfa;
+      --up: #3fb950; --down: #f85149; --radius: 14px;
+    }
+    html[data-theme="light"] {
+      --bg: #eef1f7; --bg-2: #ffffff;
+      --panel: rgba(255,255,255,0.88); --panel-solid: #ffffff;
+      --border: rgba(15,23,42,0.10); --border-strong: rgba(15,23,42,0.18);
+      --text: #1a1d24; --muted: #5a6172; --faint: #98a0b0;
+    }
+    html[data-theme="light"] header { background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.6)); }
+    html[data-theme="light"] body::after {
+      background-image:
+        linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px);
+    }
+    html[data-theme="light"] select,
+    html[data-theme="light"] input[type="datetime-local"],
+    html[data-theme="light"] .segmented,
+    html[data-theme="light"] .live,
+    html[data-theme="light"] .refresh,
+    html[data-theme="light"] .admin-link { background: #f4f6fb; }
+    html[data-theme="light"] input[type="datetime-local"] { color-scheme: light; }
+    html[data-theme="light"] .empty-pill { background: rgba(255,255,255,0.75); }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Sora', system-ui, sans-serif; font-size: 14px;
+      -webkit-font-smoothing: antialiased; position: relative; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: -2;
+      background:
+        radial-gradient(820px 520px at 12% -8%, rgba(91,141,239,0.10), transparent 60%),
+        radial-gradient(720px 480px at 92% 4%, rgba(167,139,250,0.08), transparent 60%),
+        radial-gradient(900px 600px at 70% 110%, rgba(45,212,191,0.06), transparent 60%),
+        linear-gradient(180deg, var(--bg-2), var(--bg));
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 50% 25%, #000 0%, transparent 85%);
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+    /* HEADER */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      padding: 14px 26px;
+      background: linear-gradient(180deg, rgba(10,12,18,0.94), rgba(10,12,18,0.64));
+      backdrop-filter: blur(18px) saturate(140%); border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand .mark {
+      width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+      background: linear-gradient(140deg, rgba(91,141,239,0.25), rgba(167,139,250,0.20));
+      border: 1px solid var(--border-strong); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .brand h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+    .brand .sub { font-size: 11px; color: var(--faint); margin-top: 1px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+    .control { display: flex; align-items: center; gap: 9px; }
+    .control > label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.10em; color: var(--faint); }
+    .select-wrap { position: relative; }
+    select, input[type="datetime-local"] {
+      appearance: none; background: rgba(255,255,255,0.03); color: var(--text);
+      border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px;
+      font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    input[type="datetime-local"] { font-family: 'JetBrains Mono', monospace; color-scheme: dark; }
+    select { padding-right: 32px; }
+    select:hover, input:hover { border-color: var(--border-strong); background: rgba(255,255,255,0.05); }
+    select:focus, input:focus { outline: none; border-color: var(--press); }
+    .select-wrap::after {
+      content: ''; position: absolute; right: 12px; top: 50%;
+      width: 7px; height: 7px; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted);
+      transform: translateY(-65%) rotate(45deg); pointer-events: none;
+    }
+
+    /* segmented + intervalo */
+    .range { position: relative; }
+    .segmented {
+      display: inline-flex; padding: 3px; gap: 2px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px;
+    }
+    .segmented button {
+      appearance: none; border: none; background: transparent; cursor: pointer;
+      color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500;
+      padding: 6px 13px; border-radius: 7px; transition: color .15s, background .15s;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .segmented button:hover { color: var(--text); }
+    .segmented button.active {
+      color: #fff; background: linear-gradient(180deg, rgba(91,141,239,0.32), rgba(91,141,239,0.18));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(91,141,239,0.18);
+    }
+    .pop {
+      position: absolute; right: 0; top: calc(100% + 8px); z-index: 60;
+      background: var(--panel-solid); border: 1px solid var(--border-strong); border-radius: 12px;
+      padding: 16px; width: 280px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      display: none; flex-direction: column; gap: 10px;
+    }
+    .pop.open { display: flex; }
+    .pop label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.10em; color: var(--faint); margin-bottom: 4px; display: block; }
+    .pop input { width: 100%; cursor: text; }
+    .pop .row { display: flex; gap: 8px; margin-top: 4px; }
+    .pop .btn {
+      flex: 1; appearance: none; cursor: pointer; border-radius: 8px; padding: 8px; font-family: inherit;
+      font-size: 12px; font-weight: 600; border: 1px solid var(--border);
+    }
+    .pop .btn.apply { background: linear-gradient(180deg, rgba(91,141,239,0.4), rgba(91,141,239,0.22)); color: #fff; border-color: transparent; }
+    .pop .btn.clear { background: transparent; color: var(--muted); }
+
+    .spacer { flex: 1; }
+    .live {
+      display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted);
+      letter-spacing: 0.04em; padding: 6px 11px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.02);
+    }
+    .live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--up); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(63,185,80,0.5)} 70%{box-shadow:0 0 0 7px rgba(63,185,80,0)} 100%{box-shadow:0 0 0 0 rgba(63,185,80,0)} }
+    .refresh {
+      appearance: none; cursor: pointer; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--muted); transition: color .15s, border-color .15s;
+    }
+    .refresh:hover { color: var(--text); border-color: var(--border-strong); }
+    .refresh.spin svg { animation: spin .7s ease; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .admin-link {
+      display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--muted);
+      font-size: 12px; font-weight: 500; padding: 7px 12px; border-radius: 9px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.03); transition: color .15s, border-color .15s, background .15s;
+    }
+    .admin-link:hover { color: var(--text); border-color: var(--border-strong); background: rgba(91,141,239,0.10); }
+    .profile-link {
+      display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--text);
+      padding: 4px 8px 4px 4px; border-radius: 22px; border: 1px solid transparent; transition: border-color .15s, background .15s;
+    }
+    .profile-link:hover { border-color: var(--border); background: rgba(255,255,255,0.04); }
+    .hdr-avatar {
+      width: 30px; height: 30px; border-radius: 50%; object-fit: cover; display: grid; place-items: center;
+      border: 1px solid var(--border-strong); flex-shrink: 0;
+    }
+    .hdr-avatar.initials {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #fff;
+      background: linear-gradient(140deg, #5b8def, #a78bfa);
+    }
+    .uname { font-size: 12px; color: var(--muted); }
+    .login-method { display: inline-flex; align-items: center; color: var(--faint); margin-left: 1px; }
+    .login-method svg { width: 13px; height: 13px; display: block; }
+    .logout { font-size: 12px; color: var(--press); text-decoration: none; margin-left: 2px; }
+    .logout:hover { text-decoration: underline; }
+
+    /* LAYOUT */
+    main { padding: 20px 26px 44px; max-width: 1680px; margin: 0 auto; }
+    .section-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--faint);
+      margin: 6px 0 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .meta-bar { display: flex; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); margin-bottom: 14px; }
+    .meta-bar .sep { color: var(--border-strong); }
+
+    .gauges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }
+    .charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 1080px) { .gauges { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 760px) { .gauges, .charts { grid-template-columns: 1fr; } }
+
+    /* ---- modo foco (expandir um gráfico) ---- */
+    main:not(.focus) .charts > .panel { cursor: pointer; }
+    .head-right { display: flex; align-items: center; gap: 10px; }
+    .chart-head .expand { color: var(--faint); display: inline-flex; opacity: 0; transition: opacity .15s, color .15s; }
+    .chart-head .expand svg { width: 16px; height: 16px; display: block; }
+    .panel:hover .chart-head .expand { opacity: 1; }
+    .chart-head .expand:hover { color: var(--text); }
+
+    .back-bar { display: none; align-items: center; gap: 14px; margin-bottom: 16px; }
+    main.focus .back-bar { display: flex; }
+    main.focus .gauges, main.focus #titulo-visao, main.focus #titulo-series { display: none; }
+    main.focus .charts { grid-template-columns: 1fr; }
+    main.focus .charts > .panel { display: none; }
+    main.focus .charts > .panel.focused { display: block; }
+    main.focus .charts > .panel.focused:hover { transform: none; }
+    main.focus .charts > .panel.focused .chart-canvas { height: 64vh; min-height: 380px; }
+    main.focus .chart-head .expand { display: none; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text);
+      border-radius: 9px; padding: 8px 14px; font-family: inherit; font-size: 13px; font-weight: 500;
+      transition: border-color .15s, background .15s;
+    }
+    .back-btn:hover { border-color: var(--border-strong); background: rgba(255,255,255,0.07); }
+    html[data-theme="light"] .back-btn { background: #f4f6fb; }
+    .focus-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 9px; }
+    .focus-title .glyph { width: 9px; height: 9px; border-radius: 3px; box-shadow: 0 0 12px currentColor; }
+
+    .panel {
+      position: relative; overflow: hidden; background: var(--panel);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px); transition: transform .2s, border-color .2s;
+      animation: rise .5s cubic-bezier(.2,.7,.2,1) both;
+    }
+    .panel:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+    .panel[data-i="0"]{animation-delay:.02s} .panel[data-i="1"]{animation-delay:.08s}
+    .panel[data-i="2"]{animation-delay:.14s} .panel[data-i="3"]{animation-delay:.20s}
+    .accent-line { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--c), transparent); }
+
+    /* GAUGE CARD */
+    .gauge-card { padding: 16px 18px 18px; text-align: center; }
+    .g-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.10em; color: var(--muted);
+      display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;
+    }
+    .g-title .glyph { width: 8px; height: 8px; border-radius: 2px; background: var(--c); box-shadow: 0 0 10px var(--c); }
+    .gauge { position: relative; height: 132px; margin: 2px 0 2px; }
+    .gauge canvas { display: block; }
+    .g-center { position: absolute; left: 0; right: 0; top: 56%; transform: translateY(-50%); pointer-events: none; }
+    .g-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 32px; letter-spacing: -0.03em; color: var(--text); }
+    .g-unit { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); margin-left: 3px; }
+    .g-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: var(--faint); margin-top: 2px;
+    }
+    .g-foot b { color: var(--muted); font-weight: 500; font-family: 'JetBrains Mono', monospace; }
+    .trend {
+      font-size: 11px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 20px; color: var(--muted);
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    }
+    .trend.up { color: var(--up); } .trend.down { color: var(--down); }
+
+    /* CHART CARD */
+    .chart-head { display: flex; align-items: center; justify-content: space-between; padding: 15px 18px 2px; }
+    .chart-head .t { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; }
+    .chart-head .t .glyph { width: 9px; height: 9px; border-radius: 3px; background: var(--c); box-shadow: 0 0 12px var(--c); }
+    .chart-head .now { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
+    .chart-head .now small { color: var(--muted); font-weight: 500; font-size: 12px; }
+    .chart-body { padding: 6px 14px 16px; }
+    .chart-canvas { position: relative; height: 220px; }
+    .chart-canvas canvas { display: block; }
+    .empty-wrap { position: absolute; inset: 38px 0 14px; display: grid; place-items: center; pointer-events: none; }
+    .empty-pill {
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint);
+      padding: 6px 14px; border: 1px dashed var(--border-strong); border-radius: 20px; background: rgba(7,8,12,0.6);
+    }
+    .hidden { display: none !important; }
+    .no-sensor { text-align: center; color: var(--muted); padding: 90px 20px; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#cdd3e6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14a8 8 0 0 1 16 0"/><path d="M7.5 14a4.5 4.5 0 0 1 9 0"/><circle cx="12" cy="14" r="1.4" fill="#cdd3e6" stroke="none"/>
+        </svg>
+      </div>
+      <div><h1>Telemetria de Sensores</h1><div class="sub" id="sub-label">monitoramento em tempo real</div></div>
+    </div>
+
+    {% if sensores %}
+    <div class="control">
+      <label>Sensor</label>
+      <div class="select-wrap">
+        <select id="sensor">{% for s in sensores %}<option value="{{ s.id }}">{{ s.sensor }} · {{ s.local }}</option>{% endfor %}</select>
+      </div>
+    </div>
+
+    <div class="control range">
+      <label>Período</label>
+      <div class="segmented" id="seg">
+        {% for p in periodos %}<button data-periodo="{{ p }}"{% if forloop.first %} class="active"{% endif %}>{{ p }}</button>{% endfor %}
+        <button id="btn-range" data-role="range">Intervalo
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="pop" id="pop">
+        <div><label>De</label><input type="datetime-local" id="dt-inicio"></div>
+        <div><label>Até</label><input type="datetime-local" id="dt-fim"></div>
+        <div class="row">
+          <button class="btn clear" id="range-clear">Limpar</button>
+          <button class="btn apply" id="range-apply">Aplicar</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="spacer"></div>
+    {% if sensores %}
+    <div class="live"><span class="dot"></span> AO VIVO</div>
+    <button class="refresh" id="refresh" title="Atualizar agora">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
+    {% endif %}
+    {% if request.user.is_staff %}
+    <a class="admin-link" href="{% url 'registrar' %}" title="Cadastrar novo usuário">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Usuário
+    </a>
+    {% endif %}
+    <a class="profile-link" href="{% url 'perfil' %}" title="Meu perfil">
+      {% if perfil.avatar %}<img class="hdr-avatar" src="{{ perfil.avatar.url }}" alt="">
+      {% else %}<span class="hdr-avatar initials">{{ perfil.iniciais }}</span>{% endif %}
+      <span class="uname">{{ request.user.username }}</span>
+      <span class="login-method" title="{% if login_metodo == 'google' %}Logado com Google{% else %}Logado com usuário e senha{% endif %}">
+        {% if login_metodo == 'google' %}
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
+        {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        {% endif %}
+      </span>
+    </a>
+    <a class="logout" href="{% url 'account_logout' %}">sair</a>
+  </header>
+
+  {% if sensores %}
+  <main>
+    <div class="meta-bar">
+      <span id="m-total">— registros</span><span class="sep">/</span>
+      <span id="m-range">últimas 24h</span><span class="sep">/</span>
+      <span id="m-updated">aguardando</span><span class="sep">/</span>
+      <span>auto-refresh 30s</span>
+    </div>
+
+    <div class="back-bar">
+      <button class="back-btn" id="back-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Voltar à visão geral
+      </button>
+      <div class="focus-title"><span class="glyph" id="focus-glyph"></span><span id="focus-title-text"></span></div>
+    </div>
+
+    <div class="section-title" id="titulo-visao">Visão geral</div>
+    <section class="gauges" id="gauges"></section>
+
+    <div class="section-title" id="titulo-series">Séries temporais</div>
+    <section class="charts" id="charts"></section>
+  </main>
+  {% else %}
+  <main><div class="no-sensor">Nenhum sensor vinculado à sua conta.</div></main>
+  {% endif %}
+
+  <script>
+    const METRICAS = {
+      temperatura: { label: 'Temperatura', unit: '°C',  color: '#f0883e', dec: 1, scale: [0, 50] },
+      pressao:     { label: 'Pressão',     unit: 'hPa', color: '#5b8def', dec: 1, scale: [950, 1050] },
+      umidade:     { label: 'Umidade',     unit: '%',   color: '#2dd4bf', dec: 0, scale: [0, 100] },
+      altitude:    { label: 'Altitude',    unit: 'm',   color: '#a78bfa', dec: 1, scale: [0, 1000] },
+    };
+    const KEYS = Object.keys(METRICAS);
+    const gauges = {}, mainCharts = {}, chartPanels = {};
+
+    // Cores dos gráficos conforme o tema salvo no perfil
+    const TEMA = '{{ perfil.tema|default:"dark" }}';
+    const isLight = TEMA === 'light';
+    const GRID  = isLight ? 'rgba(15,23,42,0.07)' : 'rgba(255,255,255,0.05)';
+    const TICK  = isLight ? '#6b7280' : '#565b69';
+    const TRACK = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.05)';
+    const TT_BG = isLight ? 'rgba(255,255,255,0.97)' : 'rgba(10,12,18,0.95)';
+    const TT_TITLE = isLight ? '#6b7280' : '#8b909e';
+    const TT_BODY  = isLight ? '#1a1d24' : '#e7e9f0';
+
+    function hexA(hex, a) { const n = parseInt(hex.slice(1),16); return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`; }
+    function gradient(ctx, area, color) {
+      if (!area) return hexA(color, 0.15);
+      const g = ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      g.addColorStop(0, hexA(color, 0.34)); g.addColorStop(1, hexA(color, 0)); return g;
+    }
+    const fmt = (v, d) => (v == null || isNaN(v)) ? '—' : Number(v).toFixed(d);
+
+    // monta painéis
+    const gEl = document.getElementById('gauges'), cEl = document.getElementById('charts');
+    KEYS.forEach((k, i) => {
+      const m = METRICAS[k];
+      const g = document.createElement('div');
+      g.className = 'panel gauge-card'; g.dataset.i = i; g.style.setProperty('--c', m.color);
+      g.innerHTML = `
+        <div class="accent-line"></div>
+        <div class="g-title"><span class="glyph"></span>${m.label}</div>
+        <div class="gauge">
+          <canvas id="g-${k}"></canvas>
+          <div class="g-center"><span class="g-val" id="gv-${k}">—</span><span class="g-unit">${m.unit}</span></div>
+        </div>
+        <div class="g-foot">
+          <span>mín <b id="gmin-${k}">—</b></span>
+          <span class="trend" id="gt-${k}">—</span>
+          <span>máx <b id="gmax-${k}">—</b></span>
+        </div>`;
+      gEl.appendChild(g);
+
+      const c = document.createElement('div');
+      c.className = 'panel'; c.dataset.i = i; c.style.setProperty('--c', m.color);
+      c.innerHTML = `
+        <div class="accent-line"></div>
+        <div class="chart-head">
+          <div class="t"><span class="glyph"></span>${m.label}</div>
+          <div class="head-right">
+            <div class="now"><span id="now-${k}">—</span> <small>${m.unit}</small></div>
+            <span class="expand" title="Expandir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="chart-body"><div class="chart-canvas"><canvas id="ch-${k}"></canvas></div></div>
+        <div class="empty-wrap hidden" id="empty-${k}"><div class="empty-pill">sem dados no período</div></div>`;
+      cEl.appendChild(c);
+      chartPanels[k] = c;
+      c.addEventListener('click', () => enterFocus(k));
+    });
+
+    function mkGauge(k) {
+      const m = METRICAS[k];
+      return new Chart(document.getElementById('g-'+k), {
+        type: 'doughnut',
+        data: { datasets: [{ data: [0, 100], backgroundColor: [m.color, TRACK],
+          borderWidth: 0, circumference: 252, rotation: 234, borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '74%',
+          plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { duration: 500 } }
+      });
+    }
+    function mkMain(k) {
+      const m = METRICAS[k];
+      return new Chart(document.getElementById('ch-'+k), {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: m.color, borderWidth: 2,
+          pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: m.color,
+          pointHoverBorderColor: '#0a0c12', pointHoverBorderWidth: 2, tension: 0.35, fill: true,
+          backgroundColor: (ctx) => gradient(ctx.chart.ctx, ctx.chart.chartArea, m.color), spanGaps: true }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, animation: { duration: 350 },
+          interaction: { mode: 'index', intersect: false },
+          layout: { padding: { left: 6, right: 12, top: 8, bottom: 0 } },
+          plugins: { legend: { display: false }, tooltip: {
+            backgroundColor: TT_BG, borderColor: hexA(m.color,0.4), borderWidth: 1,
+            titleColor: TT_TITLE, bodyColor: TT_BODY, padding: 10, displayColors: false,
+            titleFont: { family: 'JetBrains Mono', size: 10 }, bodyFont: { family: 'JetBrains Mono', size: 13, weight: '700' },
+            callbacks: { label: (c) => ` ${fmt(c.parsed.y, m.dec)} ${m.unit}` } } },
+          scales: {
+            x: { ticks: { color: TICK, maxTicksLimit: 7, padding: 6, font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: GRID }, border: { display: false } },
+            y: { ticks: { color: TICK, padding: 8, font: { family: 'JetBrains Mono', size: 10 }, maxTicksLimit: 6 }, grid: { color: GRID }, border: { display: false } }
+          }
+        }
+      });
+    }
+    KEYS.forEach(k => { gauges[k] = mkGauge(k); mainCharts[k] = mkMain(k); });
+
+    // Recalcula a largura dos eixos depois que a fonte carrega (evita rótulos cortados)
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        KEYS.forEach(k => { mainCharts[k].resize(); mainCharts[k].update(); gauges[k].resize(); });
+      });
+    }
+
+    // ---- modo foco: expandir um gráfico para visão detalhada ----
+    let focusKey = null;
+    function enterFocus(k) {
+      if (focusKey) return;            // já está em foco
+      focusKey = k;
+      const m = METRICAS[k];
+      Object.values(chartPanels).forEach(p => p.classList.remove('focused'));
+      chartPanels[k].classList.add('focused');
+      document.getElementById('focus-title-text').textContent = `${m.label} (${m.unit})`;
+      const glyph = document.getElementById('focus-glyph');
+      glyph.style.background = m.color; glyph.style.color = m.color;
+      document.querySelector('main').classList.add('focus');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      requestAnimationFrame(() => mainCharts[k].resize());
+    }
+    function exitFocus() {
+      if (!focusKey) return;
+      const k = focusKey; focusKey = null;
+      document.querySelector('main').classList.remove('focus');
+      chartPanels[k].classList.remove('focused');
+      requestAnimationFrame(() => KEYS.forEach(x => mainCharts[x].resize()));
+    }
+    document.getElementById('back-btn').addEventListener('click', exitFocus);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') exitFocus(); });
+
+    function stats(arr) {
+      const v = arr.filter(x => x != null && !isNaN(x));
+      if (!v.length) return null;
+      const sum = v.reduce((a,b) => a+b, 0);
+      return { last: v[v.length-1], first: v[0], min: Math.min(...v), max: Math.max(...v), avg: sum/v.length };
+    }
+
+    // ---- estado do período ----
+    let mode = 'preset';
+    let periodo = document.querySelector('#seg button.active')?.dataset.periodo || '24h';
+    let inicio = null, fim = null;
+
+    function queryString() {
+      if (mode === 'custom' && inicio && fim) return `inicio=${encodeURIComponent(inicio)}&fim=${encodeURIComponent(fim)}`;
+      return `periodo=${periodo}`;
+    }
+    function rangeLabel() {
+      if (mode === 'custom' && inicio && fim) {
+        const f = s => s.replace('T', ' ').slice(5);
+        return `${f(inicio)} → ${f(fim)}`;
+      }
+      return { '24h': 'últimas 24h', '7d': 'últimos 7 dias', '30d': 'últimos 30 dias' }[periodo] || periodo;
+    }
+
+    async function atualizar() {
+      const sensor = document.getElementById('sensor').value;
+      const btn = document.getElementById('refresh');
+      btn.classList.add('spin'); setTimeout(() => btn.classList.remove('spin'), 700);
+      document.getElementById('m-range').textContent = rangeLabel();
+      try {
+        const resp = await fetch(`api/sensor/${sensor}/series/?${queryString()}`);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const json = await resp.json();
+
+        KEYS.forEach(k => {
+          const m = METRICAS[k];
+          const data = json.series[k] || [];
+          const st = stats(data);
+
+          mainCharts[k].data.labels = json.labels;
+          mainCharts[k].data.datasets[0].data = data;
+          mainCharts[k].update();
+          document.getElementById('empty-'+k).classList.toggle('hidden', !!st);
+          document.getElementById('now-'+k).textContent = st ? fmt(st.last, m.dec) : '—';
+
+          // gauge
+          const [lo, hi] = m.scale;
+          const pct = st ? Math.max(0, Math.min(1, (st.last - lo) / (hi - lo))) : 0;
+          gauges[k].data.datasets[0].data = [pct * 100, 100 - pct * 100];
+          gauges[k].update();
+          document.getElementById('gv-'+k).textContent = st ? fmt(st.last, m.dec) : '—';
+          document.getElementById('gmin-'+k).textContent = st ? fmt(st.min, m.dec) : '—';
+          document.getElementById('gmax-'+k).textContent = st ? fmt(st.max, m.dec) : '—';
+
+          const tEl = document.getElementById('gt-'+k);
+          if (st) {
+            const diff = st.last - st.first;
+            const range = (m.scale[1] - m.scale[0]);
+            const limiar = range * 0.005;
+            if (diff > limiar) { tEl.className = 'trend up'; tEl.textContent = '▲ subindo'; }
+            else if (diff < -limiar) { tEl.className = 'trend down'; tEl.textContent = '▼ caindo'; }
+            else { tEl.className = 'trend'; tEl.textContent = '– estável'; }
+          } else { tEl.className = 'trend'; tEl.textContent = '—'; }
+        });
+
+        document.getElementById('m-total').textContent = `${json.total} registros`;
+        document.getElementById('m-updated').textContent = 'atualizado ' + new Date().toLocaleTimeString('pt-br');
+      } catch (e) {
+        document.getElementById('m-updated').textContent = 'erro: ' + e.message;
+      }
+    }
+
+    // ---- eventos ----
+    document.getElementById('sensor').addEventListener('change', atualizar);
+    document.getElementById('refresh').addEventListener('click', atualizar);
+
+    const seg = document.getElementById('seg'), pop = document.getElementById('pop'), btnRange = document.getElementById('btn-range');
+    seg.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.role === 'range') { pop.classList.toggle('open'); return; }
+      // preset
+      pop.classList.remove('open');
+      document.querySelectorAll('#seg button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active'); mode = 'preset'; periodo = b.dataset.periodo; atualizar();
+    });
+
+    document.getElementById('range-apply').addEventListener('click', () => {
+      const i = document.getElementById('dt-inicio').value, f = document.getElementById('dt-fim').value;
+      if (!i || !f) { alert('Preencha início e fim.'); return; }
+      if (i >= f) { alert('O início deve ser anterior ao fim.'); return; }
+      mode = 'custom'; inicio = i; fim = f;
+      document.querySelectorAll('#seg button[data-periodo]').forEach(x => x.classList.remove('active'));
+      btnRange.classList.add('active');
+      pop.classList.remove('open'); atualizar();
+    });
+    document.getElementById('range-clear').addEventListener('click', () => {
+      mode = 'preset'; inicio = fim = null;
+      document.getElementById('dt-inicio').value = ''; document.getElementById('dt-fim').value = '';
+      btnRange.classList.remove('active');
+      const first = document.querySelector('#seg button[data-periodo]'); first.classList.add('active'); periodo = first.dataset.periodo;
+      pop.classList.remove('open'); atualizar();
+    });
+    // fecha o popover ao clicar fora
+    document.addEventListener('click', (e) => { if (!e.target.closest('.range')) pop.classList.remove('open'); });
+
+    // pré-preenche o intervalo com as últimas 24h
+    (function seedRange() {
+      const now = new Date(), pad = n => String(n).padStart(2, '0');
+      const toLocal = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      document.getElementById('dt-fim').value = toLocal(now);
+      document.getElementById('dt-inicio').value = toLocal(new Date(now - 24*3600*1000));
+    })();
+
+    atualizar();
+    setInterval(() => { if (mode !== 'custom') atualizar(); }, 30000);
+  </script>
+</body>
+</html>
