@@ -328,8 +328,13 @@
     </a>
     {% endif %}
     <a class="profile-link" href="{% url 'perfil' %}" title="Meu perfil">
-      {% if perfil.avatar %}<img class="hdr-avatar" src="{{ perfil.avatar.url }}" alt="">
-      {% else %}<span class="hdr-avatar initials">{{ perfil.iniciais }}</span>{% endif %}
+      {% if perfil.avatar %}
+        <img class="hdr-avatar" src="{{ perfil.avatar.url }}" alt=""
+             onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+        <span class="hdr-avatar initials" style="display:none">{{ perfil.iniciais }}</span>
+      {% else %}
+        <span class="hdr-avatar initials">{{ perfil.iniciais }}</span>
+      {% endif %}
       <span class="uname">{{ request.user.username }}</span>
       <span class="login-method" title="{% if login_metodo == 'google' %}Logado com Google{% else %}Logado com usuário e senha{% endif %}">
         {% if login_metodo == 'google' %}
