@@ -113,7 +113,7 @@ UNFOLD = {
                 "separator": True,
                 "items": [
                     {
-                        "title": "DataLog Sensor",
+                        "title": "Leituras dos Sensores",
                         "icon": "data_table",
                         "link": "/admin/datalogsensor/registro/",
                     },
@@ -216,6 +216,9 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 
 USE_TZ = True
+
+# Traduções pt-BR do projeto (inclui textos do Unfold que não vêm traduzidos).
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
 
 # Static files (CSS, JavaScript, Images)

@@ -1,0 +1,206 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: projeto-sensores 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# ---- Textos da interface do Unfold (admin) ----
+
+msgid "Add row"
+msgstr "Adicionar linha"
+
+msgid "After you've created a user, you’ll be able to edit more user options."
+msgstr "Depois de criar o usuário, você poderá editar mais opções."
+
+msgid "All applications"
+msgstr "Todas as aplicações"
+
+msgid "Apply Filters"
+msgstr "Aplicar filtros"
+
+msgid "Change password"
+msgstr "Alterar senha"
+
+msgid "Change"
+msgstr "Alterar"
+
+msgid "Choose file to upload"
+msgstr "Escolher arquivo para enviar"
+
+msgid "Clear all filters"
+msgstr "Limpar todos os filtros"
+
+msgid "Click to cancel"
+msgstr "Clique para cancelar"
+
+msgid "Click to download"
+msgstr "Clique para baixar"
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Dark"
+msgstr "Escuro"
+
+msgid "Delete"
+msgstr "Excluir"
+
+msgid "Expand row"
+msgstr "Expandir linha"
+
+msgid "False"
+msgstr "Não"
+
+msgid "Filter navigation items"
+msgstr "Filtrar itens de navegação"
+
+msgid "Filters"
+msgstr "Filtros"
+
+msgid "General"
+msgstr "Geral"
+
+msgid "Go back"
+msgstr "Voltar"
+
+msgid "Hide counts"
+msgstr "Ocultar contagens"
+
+msgid "History"
+msgstr "Histórico"
+
+msgid "Home"
+msgstr "Início"
+
+msgid "Image preview"
+msgstr "Pré-visualização da imagem"
+
+msgid "Light"
+msgstr "Claro"
+
+msgid "Loading more results..."
+msgstr "Carregando mais resultados..."
+
+msgid "Log in again"
+msgstr "Entrar novamente"
+
+msgid "Log out"
+msgstr "Sair"
+
+msgid "More actions"
+msgstr "Mais ações"
+
+msgid "Next"
+msgstr "Próximo"
+
+msgid "No data"
+msgstr "Sem dados"
+
+msgid "No recent searches"
+msgstr "Nenhuma busca recente"
+
+msgid "No results found"
+msgstr "Nenhum resultado encontrado"
+
+msgid "No results matching your query"
+msgstr "Nenhum resultado para a sua busca"
+
+msgid "No, take me back"
+msgstr "Não, voltar"
+
+msgid "Previous"
+msgstr "Anterior"
+
+msgid "Recent searches"
+msgstr "Buscas recentes"
+
+msgid "Record picture"
+msgstr "Foto do registro"
+
+msgid "Remove"
+msgstr "Remover"
+
+msgid "Reset filters"
+msgstr "Redefinir filtros"
+
+msgid "Return to site"
+msgstr "Voltar ao site"
+
+msgid "Run the selected action"
+msgstr "Executar a ação selecionada"
+
+msgid "Run"
+msgstr "Executar"
+
+msgid "Save and add another"
+msgstr "Salvar e adicionar outro"
+
+msgid "Save and continue editing"
+msgstr "Salvar e continuar editando"
+
+msgid "Save and view"
+msgstr "Salvar e visualizar"
+
+msgid "Save as new"
+msgstr "Salvar como novo"
+
+msgid "Save"
+msgstr "Salvar"
+
+msgid "Search apps and models..."
+msgstr "Buscar apps e modelos..."
+
+msgid "Select all rows"
+msgstr "Selecionar todas as linhas"
+
+msgid "Show counts"
+msgstr "Mostrar contagens"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Obrigado por usar o sistema hoje."
+
+msgid "This item will be deleted."
+msgstr "Este item será excluído."
+
+msgid "This object doesn’t have a change history. It probably wasn’t added via this admin site."
+msgstr "Este objeto não possui histórico de alterações. Provavelmente não foi adicionado por este admin."
+
+msgid "This page yielded into no results. Create a new item or reset your filters."
+msgstr "Esta página não retornou resultados. Crie um novo item ou redefina os filtros."
+
+msgid "Toggle password visibility"
+msgstr "Mostrar/ocultar senha"
+
+msgid "True"
+msgstr "Sim"
+
+msgid "Type to search"
+msgstr "Digite para buscar"
+
+msgid "Unknown"
+msgstr "Desconhecido"
+
+msgid "View on site"
+msgstr "Ver no site"
+
+msgid "View site"
+msgstr "Ver site"
+
+msgid "View"
+msgstr "Visualizar"
+
+msgid "Yes, I’m sure"
+msgstr "Sim, tenho certeza"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Você não tem permissão para visualizar ou editar nada."
+
+msgid "You have been successfully logged out from the administration"
+msgstr "Você saiu da administração com sucesso."
