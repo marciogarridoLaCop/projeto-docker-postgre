@@ -1,4 +1,4 @@
-/djangoapp/static/
+# /djangoapp/static/ é fonte (favicon) — coletados vão para /data/web/static
 /djangoapp/media/
 /djangoapp/project/local_settings.py
 gunicorn-error-log

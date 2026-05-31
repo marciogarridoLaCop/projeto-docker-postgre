@@ -60,6 +60,10 @@ UNFOLD = {
     "SITE_HEADER": "Painel de Sensores",
     "SITE_URL": "/",
     "SITE_SYMBOL": "sensors",
+    "SITE_FAVICONS": [
+        {"rel": "icon", "type": "image/svg+xml", "href": "/static/favicon.svg"},
+        {"rel": "alternate icon", "type": "image/png", "href": "/static/favicon.png"},
+    ],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {
@@ -227,6 +231,9 @@ LOCALE_PATHS = [BASE_DIR / 'locale']
 STATIC_URL = '/static/'
 # /data/web/static
 STATIC_ROOT = DATA_DIR / 'static'
+
+# Estáticos do projeto (favicon, etc.)
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # WhiteNoise serve os estáticos comprimidos em produção.
 STORAGES = {
