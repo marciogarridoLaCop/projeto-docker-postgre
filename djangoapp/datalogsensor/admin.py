@@ -2,6 +2,7 @@ import csv
 
 from django.contrib import admin
 from django.http import HttpResponse
+from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 from unfold.contrib.filters.admin import RangeDateTimeFilter, RangeNumericFilter
 from unfold.decorators import display
@@ -75,8 +76,8 @@ class RegistroAdmin(ModelAdmin):
         if obj.temperatura is None:
             return '—'
         return format_html(
-            '<span style="font-variant-numeric: tabular-nums;">{:.1f} °C</span>',
-            obj.temperatura,
+            '<span style="font-variant-numeric:tabular-nums">{}</span>',
+            f'{obj.temperatura:.1f} °C',
         )
 
     @display(description='Pressão')
@@ -84,8 +85,8 @@ class RegistroAdmin(ModelAdmin):
         if obj.pressao is None:
             return '—'
         return format_html(
-            '<span style="font-variant-numeric: tabular-nums;">{:.1f} hPa</span>',
-            obj.pressao,
+            '<span style="font-variant-numeric:tabular-nums">{}</span>',
+            f'{obj.pressao:.1f} hPa',
         )
 
     @display(description='Umidade')
@@ -93,8 +94,8 @@ class RegistroAdmin(ModelAdmin):
         if obj.umidade is None:
             return '—'
         return format_html(
-            '<span style="font-variant-numeric: tabular-nums;">{:.1f} %</span>',
-            obj.umidade,
+            '<span style="font-variant-numeric:tabular-nums">{}</span>',
+            f'{obj.umidade:.1f} %',
         )
 
     @display(description='Altitude')
@@ -102,6 +103,6 @@ class RegistroAdmin(ModelAdmin):
         if obj.altitude is None:
             return '—'
         return format_html(
-            '<span style="font-variant-numeric: tabular-nums;">{:.1f} m</span>',
-            obj.altitude,
+            '<span style="font-variant-numeric:tabular-nums">{}</span>',
+            f'{obj.altitude:.1f} m',
         )
