@@ -82,6 +82,17 @@ UNFOLD = {
         "show_all_applications": True,
         "navigation": [
             {
+                "title": "Monitoramento",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Voltar ao monitoramento",
+                        "icon": "arrow_back",
+                        "link": "/",
+                    },
+                ],
+            },
+            {
                 "title": "Dispositivos",
                 "separator": True,
                 "items": [
