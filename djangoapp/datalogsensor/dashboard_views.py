@@ -75,8 +75,14 @@ def sensor_series(request, pk):
 
     registros = registros.order_by('data_registro')
 
-    # Pega os MAX_PONTOS mais recentes e reordena cronologicamente.
-    registros = list(registros)[-MAX_PONTOS:]
+    # Amostra uniformemente ao longo do período para que todos os intervalos
+    # (24h, 7d, 30d) mostrem dados distribuídos no tempo, não apenas os mais recentes.
+    total = registros.count()
+    if total > MAX_PONTOS:
+        step = max(1, total // MAX_PONTOS)
+        registros = list(registros[::step])[:MAX_PONTOS]
+    else:
+        registros = list(registros)
 
     labels, temperatura, pressao, umidade, altitude = [], [], [], [], []
     for r in registros:
