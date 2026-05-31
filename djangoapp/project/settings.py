@@ -66,6 +66,8 @@ UNFOLD = {
     ],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
+    "SHOW_FULL_RESULT_COUNT": True,
+    "DASHBOARD_CALLBACK": "project.admin_dashboard.dashboard_callback",
     "COLORS": {
         "primary": {
             "50":  "240 249 255",
@@ -83,14 +85,15 @@ UNFOLD = {
     },
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": True,
+        "show_all_applications": False,
         "navigation": [
             {
                 "title": "Monitoramento",
                 "separator": True,
+                "collapsible": False,
                 "items": [
                     {
-                        "title": "Voltar ao monitoramento",
+                        "title": "Voltar ao Dashboard",
                         "icon": "arrow_back",
                         "link": "/",
                     },
@@ -99,11 +102,13 @@ UNFOLD = {
             {
                 "title": "Dispositivos",
                 "separator": True,
+                "collapsible": False,
                 "items": [
                     {
                         "title": "Tipos de Sensor",
                         "icon": "category",
                         "link": "/admin/device/tipo/",
+                        "permission": lambda request: request.user.is_staff,
                     },
                     {
                         "title": "Sensores",
@@ -115,6 +120,7 @@ UNFOLD = {
             {
                 "title": "Registros",
                 "separator": True,
+                "collapsible": False,
                 "items": [
                     {
                         "title": "Leituras dos Sensores",
@@ -124,18 +130,27 @@ UNFOLD = {
                 ],
             },
             {
-                "title": "Administração",
+                "title": "Usuários e Perfis",
                 "separator": True,
+                "collapsible": False,
                 "items": [
                     {
                         "title": "Usuários",
                         "icon": "person",
                         "link": "/admin/auth/user/",
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": "Perfis",
+                        "icon": "manage_accounts",
+                        "link": "/admin/accounts/profile/",
+                        "permission": lambda request: request.user.is_superuser,
                     },
                     {
                         "title": "Grupos",
                         "icon": "group",
                         "link": "/admin/auth/group/",
+                        "permission": lambda request: request.user.is_superuser,
                     },
                 ],
             },
