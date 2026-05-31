@@ -6,7 +6,7 @@ def dashboard_callback(request, context):
     if request.user.is_superuser:
         sensor_qs = Sensor.objects.all()
     else:
-        sensor_qs = Sensor.objects.filter(cliente=request.user)
+        sensor_qs = Sensor.objects.filter(clientes=request.user).distinct()
 
     sensor_count = sensor_qs.count()
     tipo_count = Tipo.objects.count()

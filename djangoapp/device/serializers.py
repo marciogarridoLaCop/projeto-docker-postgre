@@ -11,4 +11,5 @@ class TipoSerializer(serializers.ModelSerializer):
 class SensorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sensor
-        fields = '__all__'
+        fields = ['id', 'sensor', 'tipo', 'local', 'macaddress',
+                  'longitude', 'latitude', 'observacao', 'data_cadastro']

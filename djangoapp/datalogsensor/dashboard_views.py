@@ -20,10 +20,10 @@ MAX_PONTOS = 1000
 
 
 def sensores_do_usuario(user):
-    """Sensores que o usuário pode ver. Superuser vê todos, cliente vê os seus."""
+    """Sensores que o usuário pode ver. Superuser vê todos, demais veem os atribuídos."""
     qs = Sensor.objects.all()
     if not user.is_superuser:
-        qs = qs.filter(cliente=user)
+        qs = qs.filter(clientes=user).distinct()
     return qs.order_by('local', 'sensor')
 
 
@@ -58,7 +58,7 @@ def sensor_series(request, pk):
 
     registros = (
         Registro.objects
-        .filter(Sensor_id=pk, Sensor__cliente=request.user)
+        .filter(Sensor_id=pk, Sensor__clientes=request.user)
         if not request.user.is_superuser
         else Registro.objects.filter(Sensor_id=pk)
     )

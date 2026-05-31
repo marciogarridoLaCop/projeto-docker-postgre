@@ -14,7 +14,7 @@ class RegistroViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return Registro.objects.all()
-        return Registro.objects.filter(Sensor__cliente=self.request.user)
+        return Registro.objects.filter(Sensor__clientes=self.request.user)
 
 
 class ListaRegistro(generics.ListAPIView):
@@ -29,4 +29,4 @@ class ListaRegistro(generics.ListAPIView):
         qs = Registro.objects.filter(Sensor_id=self.kwargs['pk'])
         if self.request.user.is_superuser:
             return qs
-        return qs.filter(Sensor__cliente=self.request.user)
+        return qs.filter(Sensor__clientes=self.request.user)
