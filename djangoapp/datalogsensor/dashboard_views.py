@@ -75,12 +75,13 @@ def sensor_series(request, pk):
 
     registros = registros.order_by('data_registro')
 
-    # Amostra uniformemente ao longo do período para que todos os intervalos
-    # (24h, 7d, 30d) mostrem dados distribuídos no tempo, não apenas os mais recentes.
+    # Amostra uniformemente ao longo do período. Reserva 1 slot para o último
+    # registro, garantindo que o gráfico sempre termine no dado mais recente.
     total = registros.count()
     if total > MAX_PONTOS:
-        step = max(1, total // MAX_PONTOS)
-        registros = list(registros[::step])[:MAX_PONTOS]
+        all_registros = list(registros)
+        step = max(1, (total - 1) // (MAX_PONTOS - 1))
+        registros = all_registros[::step][:MAX_PONTOS - 1] + [all_registros[-1]]
     else:
         registros = list(registros)
 
