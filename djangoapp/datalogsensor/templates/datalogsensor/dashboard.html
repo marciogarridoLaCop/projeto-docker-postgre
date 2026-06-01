@@ -387,8 +387,8 @@
     // Cores dos gráficos conforme o tema salvo no perfil
     const TEMA = '{{ perfil.tema|default:"dark" }}';
     const isLight = TEMA === 'light';
-    const GRID  = isLight ? 'rgba(15,23,42,0.07)' : 'rgba(255,255,255,0.05)';
-    const TICK  = isLight ? '#6b7280' : '#565b69';
+    const GRID  = isLight ? 'rgba(15,23,42,0.10)' : 'rgba(255,255,255,0.10)';
+    const TICK  = isLight ? '#374151' : '#9ca3b0';
     const TRACK = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.05)';
     const TT_BG = isLight ? 'rgba(255,255,255,0.97)' : 'rgba(10,12,18,0.95)';
     const TT_TITLE = isLight ? '#6b7280' : '#8b909e';
@@ -470,8 +470,31 @@
             titleFont: { family: 'JetBrains Mono', size: 10 }, bodyFont: { family: 'JetBrains Mono', size: 13, weight: '700' },
             callbacks: { label: (c) => ` ${fmt(c.parsed.y, m.dec)} ${m.unit}` } } },
           scales: {
-            x: { ticks: { color: TICK, maxTicksLimit: 7, padding: 6, font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: GRID }, border: { display: false } },
-            y: { ticks: { color: TICK, padding: 8, font: { family: 'JetBrains Mono', size: 10 }, maxTicksLimit: 6 }, grid: { color: GRID }, border: { display: false } }
+            x: {
+              ticks: {
+                color: TICK, maxTicksLimit: 6, padding: 8,
+                maxRotation: 0, minRotation: 0,
+                font: { family: 'JetBrains Mono', size: 11 },
+                callback: function(val) {
+                  const lbl = this.getLabelForValue(val);
+                  if (!lbl) return '';
+                  const parts = lbl.split(' ');
+                  return parts.length === 2 ? [parts[1], parts[0]] : lbl;
+                }
+              },
+              grid: { color: GRID, lineWidth: 1 },
+              border: { display: false }
+            },
+            y: {
+              ticks: {
+                color: TICK, padding: 10,
+                font: { family: 'JetBrains Mono', size: 11 },
+                maxTicksLimit: 5,
+                callback: (v) => Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+              },
+              grid: { color: GRID, lineWidth: 1 },
+              border: { display: false }
+            }
           }
         }
       });
