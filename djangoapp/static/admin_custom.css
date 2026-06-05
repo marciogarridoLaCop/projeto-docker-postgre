@@ -1,4 +1,4 @@
-/* Espaço no rodapé para a barra de ações fixa não cobrir as últimas linhas */
-body:has(input.action-select:checked) {
-    padding-bottom: 72px;
+/* Quando itens estão selecionados, sobe a paginação acima da barra de ações */
+body:has(input.action-select:checked) #pagination-wrapper {
+    bottom: 64px;
 }
