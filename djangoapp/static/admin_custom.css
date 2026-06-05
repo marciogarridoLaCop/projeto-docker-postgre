@@ -1,10 +1,4 @@
-/* Garante espaço no rodapé para a barra de ações fixa não cobrir as últimas linhas */
+/* Espaço no rodapé para a barra de ações fixa não cobrir as últimas linhas */
 body:has(input.action-select:checked) {
-    padding-bottom: 80px;
-}
-
-@media (min-width: 1024px) {
-    body:has(input.action-select:checked) {
-        padding-bottom: 100px;
-    }
+    padding-bottom: 72px;
 }
