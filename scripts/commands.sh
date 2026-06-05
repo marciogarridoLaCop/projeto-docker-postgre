@@ -12,6 +12,7 @@ else
   echo "⚠️  POSTGRES_HOST or POSTGRES_PORT not set — skipping database wait."
 fi
 
+python manage.py compilemessages --locale pt_BR
 python manage.py collectstatic --noinput
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
