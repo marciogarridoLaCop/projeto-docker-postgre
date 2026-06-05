@@ -1,0 +1,10 @@
+/* Padding-bottom no formulário quando a barra de ações está visível (itens selecionados) */
+#changelist-form:has(input.action-select:checked) {
+    padding-bottom: 80px;
+}
+
+@media (min-width: 1024px) {
+    #changelist-form:has(input.action-select:checked) {
+        padding-bottom: 96px;
+    }
+}

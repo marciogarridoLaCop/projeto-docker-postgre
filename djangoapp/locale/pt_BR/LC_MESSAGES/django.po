@@ -154,6 +154,15 @@ msgstr "Salvar"
 msgid "Search apps and models..."
 msgstr "Buscar apps e modelos..."
 
+msgid "Select action"
+msgstr "Selecionar ação"
+
+msgid "Select action to run"
+msgstr "Selecionar ação para executar"
+
+msgid "Select record"
+msgstr "Selecionar registro"
+
 msgid "Select all rows"
 msgstr "Selecionar todas as linhas"
 
