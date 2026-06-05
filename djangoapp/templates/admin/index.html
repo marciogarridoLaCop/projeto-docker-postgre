@@ -9,18 +9,18 @@
   {# ── KPI Cards ─────────────────────────────────────────────────────── #}
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
     {% for kpi in kpis %}
-    <a href="{{ kpi.link }}" class="group block rounded-xl border border-gray-200 dark:border-gray-700
-       bg-white dark:bg-gray-800 p-5 shadow-sm hover:shadow-md transition-all
+    <a href="{{ kpi.link }}" class="group block rounded-default border border-base-200 dark:border-base-800
+       bg-white dark:bg-base-900 p-5 shadow-xs hover:shadow-sm transition-all
        hover:border-primary-400 dark:hover:border-primary-500 no-underline">
       <div class="flex items-start justify-between">
         <div>
-          <p class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <p class="text-3xl font-extrabold text-base-900 dark:text-base-100 tracking-tight">
             {{ kpi.metric }}
           </p>
-          <p class="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-sm font-medium text-base-500 dark:text-base-400">
             {{ kpi.title }}
           </p>
-          <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+          <p class="mt-0.5 text-xs text-base-400 dark:text-base-500">
             {{ kpi.description }}
           </p>
         </div>
@@ -35,12 +35,12 @@
 
   {# ── Ações Rápidas ─────────────────────────────────────────────────── #}
   <div class="mb-8">
-    <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+    <h2 class="text-xs font-semibold uppercase tracking-widest text-base-400 dark:text-base-500 mb-3">
       {% trans "Ações rápidas" %}
     </h2>
     <div class="flex flex-wrap gap-2">
       <a href="/admin/device/sensor/add/"
-         class="inline-flex items-center gap-1.5 rounded-lg border border-primary-300 dark:border-primary-700
+         class="inline-flex items-center gap-1.5 rounded-default border border-primary-300 dark:border-primary-700
                 bg-primary-50 dark:bg-primary-900/30 px-3 py-1.5 text-sm font-medium
                 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/60
                 transition-colors no-underline">
@@ -48,25 +48,25 @@
         {% trans "Novo Sensor" %}
       </a>
       <a href="/admin/device/tipo/add/"
-         class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700
-                bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium
-                text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700
+         class="inline-flex items-center gap-1.5 rounded-default border border-base-200 dark:border-base-700
+                bg-base-50 dark:bg-base-800 px-3 py-1.5 text-sm font-medium
+                text-base-700 dark:text-base-300 hover:bg-base-100 dark:hover:bg-base-700
                 transition-colors no-underline">
         <span class="material-symbols-outlined text-base leading-none">add</span>
         {% trans "Novo Tipo" %}
       </a>
       <a href="/admin/auth/user/add/"
-         class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700
-                bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium
-                text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700
+         class="inline-flex items-center gap-1.5 rounded-default border border-base-200 dark:border-base-700
+                bg-base-50 dark:bg-base-800 px-3 py-1.5 text-sm font-medium
+                text-base-700 dark:text-base-300 hover:bg-base-100 dark:hover:bg-base-700
                 transition-colors no-underline">
         <span class="material-symbols-outlined text-base leading-none">person_add</span>
         {% trans "Novo Usuário" %}
       </a>
       <a href="/"
-         class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700
-                bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium
-                text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700
+         class="inline-flex items-center gap-1.5 rounded-default border border-base-200 dark:border-base-700
+                bg-base-50 dark:bg-base-800 px-3 py-1.5 text-sm font-medium
+                text-base-700 dark:text-base-300 hover:bg-base-100 dark:hover:bg-base-700
                 transition-colors no-underline">
         <span class="material-symbols-outlined text-base leading-none">monitor_heart</span>
         {% trans "Ver Dashboard" %}
@@ -78,7 +78,7 @@
   {% if recent_readings %}
   <div class="mb-8">
     <div class="flex items-center justify-between mb-3">
-      <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+      <h2 class="text-xs font-semibold uppercase tracking-widest text-base-400 dark:text-base-500">
         {% trans "Últimas leituras" %}
       </h2>
       <a href="/admin/datalogsensor/registro/"
@@ -86,51 +86,51 @@
         {% trans "Ver todas →" %}
       </a>
     </div>
-    <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700
-                bg-white dark:bg-gray-800 shadow-sm">
+    <div class="overflow-hidden rounded-default border border-base-200 dark:border-base-800
+                bg-white dark:bg-base-900 shadow-xs">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-gray-100 dark:border-gray-700
-                     bg-gray-50 dark:bg-gray-900/50 text-left">
-            <th class="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          <tr class="border-b border-base-100 dark:border-base-800
+                     bg-base-50 dark:bg-base-800 text-left">
+            <th class="px-4 py-2.5 text-xs font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide">
               {% trans "Sensor" %}
             </th>
-            <th class="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <th class="px-4 py-2.5 text-xs font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide">
               {% trans "Data / Hora" %}
             </th>
-            <th class="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <th class="px-4 py-2.5 text-xs font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide">
               {% trans "Temp." %}
             </th>
-            <th class="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <th class="px-4 py-2.5 text-xs font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide">
               {% trans "Umidade" %}
             </th>
-            <th class="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <th class="px-4 py-2.5 text-xs font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide">
               {% trans "Pressão" %}
             </th>
-            <th class="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hidden md:table-cell">
+            <th class="px-4 py-2.5 text-xs font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide hidden md:table-cell">
               {% trans "Altitude" %}
             </th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+        <tbody class="divide-y divide-base-100 dark:divide-base-800">
           {% for r in recent_readings %}
-          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+          <tr class="hover:bg-base-50 dark:hover:bg-base-800/40 transition-colors">
+            <td class="px-4 py-2.5 font-medium text-base-900 dark:text-base-100 whitespace-nowrap">
               {% if r.Sensor %}{{ r.Sensor.sensor }}{% else %}—{% endif %}
             </td>
-            <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap font-mono text-xs">
-              {{ r.data }} {{ r.hora }}
+            <td class="px-4 py-2.5 text-base-500 dark:text-base-400 whitespace-nowrap font-mono text-xs">
+              {% if r.data %}{{ r.data }}{% else %}—{% endif %}{% if r.hora %} {{ r.hora }}{% endif %}
             </td>
-            <td class="px-4 py-2.5 tabular-nums text-gray-700 dark:text-gray-300">
+            <td class="px-4 py-2.5 tabular-nums text-base-700 dark:text-base-300">
               {% if r.temperatura is not None %}{{ r.temperatura|floatformat:1 }} °C{% else %}—{% endif %}
             </td>
-            <td class="px-4 py-2.5 tabular-nums text-gray-700 dark:text-gray-300">
+            <td class="px-4 py-2.5 tabular-nums text-base-700 dark:text-base-300">
               {% if r.umidade is not None %}{{ r.umidade|floatformat:1 }} %{% else %}—{% endif %}
             </td>
-            <td class="px-4 py-2.5 tabular-nums text-gray-700 dark:text-gray-300">
+            <td class="px-4 py-2.5 tabular-nums text-base-700 dark:text-base-300">
               {% if r.pressao is not None %}{{ r.pressao|floatformat:1 }} hPa{% else %}—{% endif %}
             </td>
-            <td class="px-4 py-2.5 tabular-nums text-gray-700 dark:text-gray-300 hidden md:table-cell">
+            <td class="px-4 py-2.5 tabular-nums text-base-700 dark:text-base-300 hidden md:table-cell">
               {% if r.altitude is not None %}{{ r.altitude|floatformat:1 }} m{% else %}—{% endif %}
             </td>
           </tr>
@@ -141,9 +141,9 @@
   </div>
   {% endif %}
 
-  {# ── Modelos (lista padrão do Unfold) ──────────────────────────────── #}
+  {# ── Módulos (lista padrão do Unfold) ──────────────────────────────── #}
   <div>
-    <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+    <h2 class="text-xs font-semibold uppercase tracking-widest text-base-400 dark:text-base-500 mb-3">
       {% trans "Todos os módulos" %}
     </h2>
     {% include "unfold/helpers/app_list_default.html" %}
