@@ -1,6 +1,12 @@
 {% load admin_list unfold %}
 
 {% if cl %}
+    <style>
+        /* Sobe a paginação sticky acima da barra de ações (fixed bottom-0, 64px de altura) */
+        body:has(input.action-select:checked) #pagination-wrapper {
+            bottom: 64px !important;
+        }
+    </style>
     <div id="pagination-wrapper" class="px-4 lg:backdrop-blur-xs lg:bg-white/80 lg:flex lg:items-center lg:dark:bg-base-900/80 lg:left-0 lg:right-0 lg:bottom-0 lg:sticky relative z-40 lg:border-t lg:border-base-200 lg:relative lg:scrollable-top lg:dark:border-base-800 {% element_classes 'pagination' %}">
         {% pagination cl %}
     </div>

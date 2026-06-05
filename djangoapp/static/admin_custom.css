@@ -1,4 +1,1 @@
-/* Quando itens estão selecionados, sobe a paginação acima da barra de ações */
-body:has(input.action-select:checked) #pagination-wrapper {
-    bottom: 64px;
-}
+/* Reservado para customizações futuras do admin */
