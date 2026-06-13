@@ -195,15 +195,11 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Banco: PostgreSQL gerenciado do Render, via DATABASE_URL.
-# (Sem Postgres no docker-compose — defina DATABASE_URL no .env para rodar local.)
-import dj_database_url  # noqa: E402
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 
